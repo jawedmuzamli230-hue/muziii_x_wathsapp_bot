@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MUZAMIL_X_RAJPUT_BOT</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; min-height: 100vh; overflow: hidden; position: relative; }
+    #matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.55; }
+    .container { position: relative; z-index: 2; max-width: 480px; margin: 0 auto; padding: 40px 20px; text-align: center; }
+    h1 { font-size: 26px; letter-spacing: 2px; margin-bottom: 8px; color: #00ff41; text-shadow: 0 0 10px #00ff41; animation: flicker 3s infinite; }
+    @keyframes flicker { 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: 0.4; } }
+    .subtitle { color: #00cc33; font-size: 12px; margin-bottom: 30px; }
+    .terminal { background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff41; border-radius: 6px; padding: 20px; box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); }
+    .terminal-header { display: flex; gap: 6px; margin-bottom: 15px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #ff3b30; } .dot.yellow { background: #ffcc00; } .dot.green { background: #28cd41; }
+    .prompt { font-size: 12px; text-align: left; color: #00cc33; margin-bottom: 12px; }
+    input { width: 100%; padding: 12px; background: #000; border: 1px solid #00ff41; border-radius: 4px; color: #00ff41; font-size: 15px; outline: none; margin-bottom: 12px; }
+    input:focus { box-shadow: 0 0 10px #00ff41; }
+    button { width: 100%; padding: 13px; background: transparent; border: 1px solid #00ff41; color: #00ff41; font-size: 14px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+    button:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
+    #codeDisplay { margin-top: 18px; font-size: 22px; font-weight: bold; letter-spacing: 6px; color: #00ff41; text-shadow: 0 0 10px #00ff41; min-height: 30px; }
+    .steps { margin-top: 25px; padding: 15px; background: rgba(0, 255, 65, 0.05); border-left: 3px solid #00ff41; text-align: left; font-size: 12px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="container">
+    <h1>MUZAMIL_X_RAJPUT_BOT</h1>
+    <div class="subtitle">[ SECURE PAIRING INTERFACE ]</div>
+    <div class="terminal">
+        <div class="terminal-header">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        </div>
+        <div class="prompt">Enter WhatsApp number (with country code)</div>
+        <input type="tel" id="phone" placeholder="923001234567" maxlength="15">
+        <button onclick="getCode()">Generate Pairing Code</button>
+        <div id="codeDisplay"></div>
+        <div class="steps">
+            <b>📲 CODE MILNE KE BAAD:</b>
+            <ol style="margin-left: 18px; margin-top: 6px;">
+                <li>WhatsApp -> Linked Devices</li>
+                <li>Link with phone number</li>
+                <li>8-digit code type karein</li>
+            </ol>
+        </div>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('matrix'), ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+const chars = 'アイウエオカキクケコ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+let drops = Array(Math.floor(canvas.width / 14)).fill(1);
+setInterval(() => {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.06)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00ff41'; ctx.font = '14px monospace';
+    for (let i = 0; i < drops.length; i++) {
+        ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 14, drops[i] * 14);
+        if (drops[i] * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
+}, 50);
+async function getCode() {
+    const phone = document.getElementById('phone').value.trim(), display = document.getElementById('codeDisplay');
+    if (!phone) return display.innerText = '⚠ ENTER NUMBER';
+    display.innerText = '[ CONNECTING... ]';
+    try {
+        const res = await fetch('/api/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: phone }) });
+        const data = await res.json();
+        display.innerText = data.code ? '⟩ ' + data.code.split('').join(' ') : '✗ ' + (data.error || 'ERROR');
+    } catch (e) { display.innerText = '✗ NETWORK ERROR'; }
+}
+</script>
+</body>
+</html>
